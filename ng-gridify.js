@@ -12,21 +12,23 @@
 					var defaults = {
 						wrapperSelector: '.wrapper',
 						tileSelector: '[data-ratio]',
-						columns: 3,
-						gutter: 0
+						perRow: 5,
+						gutter: 0,
+						// minRowLength: 3, // rows shorter than this will use the average row height (defaults to 50% of perRow if not set)
+						// averageRatio: 1.5 // optionally try to balance rows by working in combination with perRow
 					};
 
 					var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
 
-					var _columns = function() {
-						if (typeof(options.columns) === 'string') {
-							if (typeof(scope[options.columns]) === 'function') {
-								return scope[options.columns]();
+					var _perRow = function() {
+						if (typeof(options.perRow) === 'string') {
+							if (typeof(scope[options.perRow]) === 'function') {
+								return scope[options.perRow]();
 							} else {
-								$log.error('ngGridify: columns is not a function');
+								$log.error('ngGridify: perRow is not a function');
 							}
 						} else {
-							return options.columns;
+							return options.perRow;
 						}
 					};
 
@@ -45,47 +47,60 @@
 					var _resize = function() {
 
 						var totalWidth = element[0].clientWidth;
-						var totalRatio = 0;
+						var totalRatio = 0, rowRatio = 0;
 
 						var rows = [];
-						var columns = _columns();
+						var perRow = _perRow();
 						var gutter = _gutter();
 
-						var row = [];
-						angular.forEach(targets, function(t, i){
-							if (row.length === columns) {
-								rows.push(row);
-								row = [];
+						var minRowLength = options.minRowLength !== undefined ? options.minRowLength : perRow * 0.5;
+
+						var row = {tiles: []};
+						angular.forEach(targets, function(tile, i){
+							tile = angular.element(tile);
+
+							tile.ratio = Number(tile.attr('data-ratio'));
+
+							if (options.averageRatio !== undefined) {
+								if (rowRatio + tile.ratio > options.averageRatio * perRow) {
+									row.ratio = rowRatio;
+									rows.push(row);
+
+									row = {tiles: []};
+									rowRatio = 0;
+								}
+							} else {
+								if (row.tiles.length === perRow) {
+									row.ratio = rowRatio;
+									rows.push(row);
+
+									row = {tiles: []};
+									rowRatio = 0;
+								}
 							}
-							row.push(angular.element(t));
+
+							rowRatio += tile.ratio;
+
+							row.tiles.push(tile);
 						});
+						row.ratio = rowRatio;
 						rows.push(row);
 
-						angular.forEach(rows, function(r, i){
-							var rowRatio = 0;
+						angular.forEach(rows, function(row, i){
+							rowRatio = row.tiles.length < minRowLength ? totalRatio / rows.length+1 : row.ratio;
 
-							if (r.length === columns) {
-								angular.forEach(r, function(t, ii){
-									rowRatio += Number(t.attr('data-ratio'));
-								});
+							totalRatio += rowRatio;
 
-								totalRatio += rowRatio;
-
-							} else {
-								rowRatio = Math.max(r.length*2, totalRatio / rows.length);
-							}
-
-							angular.forEach(r, function(t, ii){
-								var tRatio = Number(t.attr('data-ratio'));
-								var width = (tRatio / rowRatio) * (totalWidth - (gutter * (columns - 1)));
-								var height = width * (1 / tRatio);
+							angular.forEach(row.tiles, function(tile, ii){
+								var width = (tile.ratio / rowRatio) * (totalWidth - (gutter * (row.tiles.length - 1)));
+								var height = width * (1 / tile.ratio);
 
 								var css = {
 									width: width,
 									height: height
 								};
 
-								if (ii < r.length-1) {
+								if (ii < row.tiles.length-1) {
 									css.marginRight = gutter;
 								}
 
@@ -93,11 +108,11 @@
 									css.marginBottom = gutter;
 								}
 
-								t.css(css);
+								tile.css(css);
 							});
 						});
 
-						element.children(options.wrapperSelector).css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
+						angular.element(element[0].querySelectorAll(options.wrapperSelector)).css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
 					};
 
 					// wait for ng-repeat elements to be rendered
