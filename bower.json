@@ -1,8 +1,8 @@
 {
-    "name": "ng-gridify",
-    "version": "0.0.2",
+    "name": "angular-gridify",
+    "version": "0.0.3",
     "description": "Angular directive that creates a justified grid of elements",
-    "main": "ng-gridify.js",
+    "main": "angular-gridify.js",
     "dependencies": {
         "angular": ">= 1.2.4"
     }

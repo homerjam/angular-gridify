@@ -1,11 +1,11 @@
-# ng-gridify
+# angular-gridify
 
 Angular directive that creates a justified grid of elements
 
 ## Installation
 
-`bower install ng-gridify`
+`bower install angular-gridify`
 
 ## Demo
 
-http://homerjam.github.io/ng-gridify/
+http://homerjam.github.io/angular-gridify/

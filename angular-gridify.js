@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    angular.module('ng-gridify', [])
+    angular.module('angular-gridify', [])
         .directive('ngGridify', ['$log', '$timeout', '$window', function($log, $timeout, $window) {
             return {
                 restrict: 'A',

@@ -15,4 +15,4 @@ angular.module('ExampleCtrl', []).controller('ExampleCtrl', ['$scope',
     }
 ]);
 
-angular.module('ExampleApp', ['ng-gridify', 'ExampleCtrl']).config(function() {});
+angular.module('ExampleApp', ['angular-gridify', 'ExampleCtrl']).config(function() {});
