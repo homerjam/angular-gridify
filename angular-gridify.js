@@ -20,27 +20,17 @@
 
 					var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
 
-					var _perRow = function() {
-						if (typeof(options.perRow) === 'string') {
-							if (typeof(scope[options.perRow]) === 'function') {
-								return scope[options.perRow]();
+					var _prop = function(propName) {
+						if (typeof(options[propName]) === 'string') {
+							if (typeof(scope[options[propName]]) === 'function') {
+								return scope[options[propName]]();
 							} else {
-								$log.error('ngGridify: perRow is not a function');
+								$log.error('ngGridify: '+propName+' is not a function');
 							}
+						} else if (typeof(options[propName]) === 'function') {
+							$log.error('ngGridify: '+propName+' is not valid');
 						} else {
-							return options.perRow;
-						}
-					};
-
-					var _gutter = function() {
-						if (typeof(options.gutter) === 'string') {
-							if (typeof(scope[options.gutter]) === 'function') {
-								return scope[options.gutter]();
-							} else {
-								$log.error('ngGridify: gutter is not a function');
-							}
-						} else {
-							return options.gutter;
+							return options[propName];
 						}
 					};
 
@@ -50,10 +40,11 @@
 						var totalRatio = 0, rowRatio = 0;
 
 						var rows = [];
-						var perRow = _perRow();
-						var gutter = _gutter();
+						var perRow = _prop('perRow');
+						var gutter = _prop('gutter');
 
-						var minRowLength = options.minRowLength !== undefined ? options.minRowLength : perRow * 0.5;
+						var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow * 0.5;
+						var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
 
 						var row = {tiles: []};
 						angular.forEach(targets, function(tile, i){
@@ -61,8 +52,8 @@
 
 							tile.ratio = Number(tile.attr('data-ratio'));
 
-							if (options.averageRatio !== undefined) {
-								if (rowRatio + tile.ratio > options.averageRatio * perRow) {
+							if (averageRatio) {
+								if (rowRatio + tile.ratio > averageRatio * perRow) {
 									row.ratio = rowRatio;
 									rows.push(row);
 
@@ -95,20 +86,12 @@
 								var width = (tile.ratio / rowRatio) * (totalWidth - (gutter * (row.tiles.length - 1)));
 								var height = width * (1 / tile.ratio);
 
-								var css = {
+								tile.css({
 									width: width,
-									height: height
-								};
-
-								if (ii < row.tiles.length-1) {
-									css.marginRight = gutter;
-								}
-
-								if (i < rows.length-1) {
-									css.marginBottom = gutter;
-								}
-
-								tile.css(css);
+									height: height,
+									marginRight: ii < row.tiles.length-1 ? gutter : 0,
+									marginBottom: i < rows.length-1 ? gutter : 0
+								});
 							});
 						});
 
