@@ -14,7 +14,7 @@
 						tileSelector: '[data-ratio]',
 						perRow: 5,
 						gutter: 0,
-						// minRowLength: 3, // rows shorter than this will use the average row height (defaults to 50% of perRow if not set)
+						// minRowLength: 3, // rows shorter than this will use the average row height (defaults to perRow-1 if not set)
 						// averageRatio: 1.5 // optionally try to balance rows by working in combination with perRow
 					};
 
@@ -43,7 +43,7 @@
 						var perRow = _prop('perRow');
 						var gutter = _prop('gutter');
 
-						var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow * 0.5;
+						var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow - 1;
 						var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
 
 						var row = {tiles: []};
@@ -78,7 +78,7 @@
 						rows.push(row);
 
 						angular.forEach(rows, function(row, i){
-							rowRatio = row.tiles.length < minRowLength ? totalRatio / rows.length+1 : row.ratio;
+							rowRatio = i === rows.length-1 && row.tiles.length < minRowLength ? totalRatio / rows.length+1 : row.ratio;
 
 							totalRatio += rowRatio;
 
