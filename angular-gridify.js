@@ -29,10 +29,11 @@
                                 return null;
                             }
                         } else if (typeof(options[propName]) === 'function') {
-                            $log.error('ngGridify: ' + propName + ' is not valid');
-                            return null;
-                        } else {
+                            return options[propName]();
+                        } else if (typeof(options[propName]) === 'number') {
                             return options[propName];
+                        } else {
+                            $log.error('ngGridify: ' + propName + ' is not valid');
                         }
                     };
 
