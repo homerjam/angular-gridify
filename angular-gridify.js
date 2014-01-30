@@ -14,8 +14,10 @@
                         tileSelector: '[data-ratio]',
                         perRow: 5,
                         gutter: 0
-                        // minRowLength: 3, // rows shorter than this will use the average row height (defaults to perRow-1 if not set)
-                        // averageRatio: 1.5 // optionally try to balance rows by working in combination with perRow
+                        // gutterColumns: 10 // gutter between columns, overrides `gutter`
+                        // gutterRows: 10 // gutter between rows, overrides `gutter`
+                        // minRowLength: 3 // rows shorter than this will use the average row height (defaults to `perRow-1` if not set)
+                        // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
                     };
 
                     var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
@@ -32,7 +34,7 @@
                             return options[propName]();
                         } else if (typeof(options[propName]) === 'number') {
                             return options[propName];
-                        } else {
+                        } else if (typeof(options[propName]) === 'object') {
                             $log.error('ngGridify: ' + propName + ' is not valid');
                         }
                     };
@@ -46,6 +48,9 @@
                         var rows = [];
                         var perRow = _prop('perRow');
                         var gutter = _prop('gutter');
+
+                        var gutterColumns = _prop('gutterColumns');
+                        var gutterRows = _prop('gutterRows');
 
                         var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow - 1;
                         var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
@@ -93,14 +98,14 @@
                             totalRatio += rowRatio;
 
                             angular.forEach(row.tiles, function(tile, ii) {
-                                var width = (tile.ratio / rowRatio) * (totalWidth - (gutter * (row.tiles.length - 1)));
+                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * (row.tiles.length - 1)));
                                 var height = width * (1 / tile.ratio);
 
                                 tile.css({
                                     width: width,
                                     height: height,
-                                    marginRight: ii < row.tiles.length - 1 ? gutter : 0,
-                                    marginBottom: i < rows.length - 1 ? gutter : 0
+                                    marginRight: ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0,
+                                    marginBottom: i < rows.length - 1 ? (gutterRows || gutter) : 0
                                 });
                             });
                         });
