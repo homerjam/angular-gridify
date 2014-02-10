@@ -93,12 +93,12 @@
                         rows.push(row);
 
                         angular.forEach(rows, function(row, i) {
-                            rowRatio = i === rows.length - 1 && row.tiles.length < minRowLength && totalRatio > 0 ? totalRatio / rows.length + 1 : row.ratio;
+                            rowRatio = i === rows.length - 1 && row.tiles.length < minRowLength && totalRatio > 0 ? Math.max(totalRatio / (rows.length - 1), row.ratio) : row.ratio;
 
                             totalRatio += rowRatio;
 
                             angular.forEach(row.tiles, function(tile, ii) {
-                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * (row.tiles.length - 1)));
+                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * Math.max(row.tiles.length - 1, perRow)));
                                 var height = width * (1 / tile.ratio);
 
                                 tile.css({
