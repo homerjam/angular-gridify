@@ -98,7 +98,8 @@
                             totalRatio += rowRatio;
 
                             angular.forEach(row.tiles, function(tile, ii) {
-                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * Math.max(row.tiles.length - 1, perRow)));
+                                var gutters = row.tiles.length < minRowLength ? Math.max(row.tiles.length - 1, perRow) : row.tiles.length - 1;
+                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * gutters));
                                 var height = width * (1 / tile.ratio);
 
                                 tile.css({
