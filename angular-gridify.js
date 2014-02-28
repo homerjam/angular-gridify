@@ -18,6 +18,8 @@
                         // gutterRows: 10 // gutter between rows, overrides `gutter`
                         // minRowLength: 3 // rows shorter than this will use the average row height (defaults to `perRow-1` if not set)
                         // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
+                        // maxRowHeight: 100 // rows will not exceed this height, use in combination with `alignment`
+                        // alignment: 'left' // left/right/justify - alignment for rows which do not fill width
                     };
 
                     var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
@@ -55,6 +57,10 @@
                         var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow - 1;
                         var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
 
+                        var maxRowHeight = options.maxRowHeight !== undefined ? _prop('maxRowHeight') : 0;
+
+                        var alignment = options.alignment || 'left';
+
                         var row = {
                             tiles: []
                         };
@@ -62,9 +68,10 @@
                             tile = angular.element(tile);
 
                             tile.ratio = Number(tile.attr('data-ratio'));
+                            tile.inverseRatio = 1 / tile.ratio;
 
                             if (averageRatio) {
-                                if (rowRatio + tile.ratio > averageRatio * perRow) {
+                                if (rowRatio + tile.ratio > averageRatio * perRow && (maxRowHeight === 0 || (maxRowHeight > 0 && totalWidth * (1 / rowRatio) < maxRowHeight))) {
                                     row.ratio = rowRatio;
                                     rows.push(row);
 
@@ -99,15 +106,39 @@
 
                             angular.forEach(row.tiles, function(tile, ii) {
                                 var gutters = row.tiles.length < minRowLength ? Math.max(row.tiles.length - 1, perRow) : row.tiles.length - 1;
-                                var width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * gutters));
-                                var height = width * (1 / tile.ratio);
 
-                                tile.css({
+                                var width, height;
+
+                                width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * gutters));
+                                height = width * (1 / tile.ratio);
+
+                                if (maxRowHeight > 0 && height > maxRowHeight) {
+                                    height = maxRowHeight;
+                                    width = height / tile.inverseRatio;
+                                }
+
+                                var css = {
+                                    float: alignment !== 'justify' ? alignment : 'left',
                                     width: width,
                                     height: height,
-                                    marginRight: ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0,
-                                    marginBottom: i < rows.length - 1 ? (gutterRows || gutter) : 0
-                                });
+                                    marginLeft: 0,
+                                    marginRight: 0
+                                };
+
+                                if (maxRowHeight > 0 && height === maxRowHeight && alignment === 'justify') {
+                                    css.marginLeft = ii > 0 ? (totalWidth - (maxRowHeight * rowRatio)) / (row.tiles.length - 1) : 0;
+
+                                } else {
+                                    if (alignment === 'right') {
+                                        css.marginLeft = ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
+                                    } else {
+                                        css.marginRight = ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
+                                    }
+                                }
+
+                                css.marginBottom = i < rows.length - 1 ? (gutterRows || gutter) : 0;
+
+                                tile.css(css);
                             });
                         });
 
