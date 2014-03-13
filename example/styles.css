@@ -8,10 +8,6 @@ body {
 	width: 100%;
 }
 
-.wrapper {
-	overflow: auto;
-}
-
 .tile {
 	float: left;
 }
