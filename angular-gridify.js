@@ -14,12 +14,12 @@
                         tileSelector: '[data-ratio]',
                         perRow: 5,
                         gutter: 0
+                        // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
                         // gutterColumns: 10 // gutter between columns, overrides `gutter`
                         // gutterRows: 10 // gutter between rows, overrides `gutter`
-                        // minRowLength: 3 // rows shorter than this will use the average row height (defaults to `perRow-1` if not set)
-                        // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
                         // maxRowHeight: 100 // rows will not exceed this height, use in combination with `alignment`
                         // alignment: 'left' // left/right/justify - alignment for rows which do not fill width
+                        // minRowLength: 5 // optionally make rows longer than this fill the available width
                     };
 
                     var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
@@ -54,7 +54,7 @@
                         var gutterColumns = _prop('gutterColumns');
                         var gutterRows = _prop('gutterRows');
 
-                        var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : perRow - 1;
+                        var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : -1;
                         var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
 
                         var maxRowHeight = options.maxRowHeight !== undefined ? _prop('maxRowHeight') : 0;
@@ -100,12 +100,12 @@
                         rows.push(row);
 
                         angular.forEach(rows, function(row, i) {
-                            rowRatio = i === rows.length - 1 && row.tiles.length < minRowLength && totalRatio > 0 ? Math.max(totalRatio / (rows.length - 1), row.ratio) : row.ratio;
+                            rowRatio = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) && totalRatio > 0 ? Math.max(totalRatio / (rows.length - 1), row.ratio) : row.ratio;
 
                             totalRatio += rowRatio;
 
                             angular.forEach(row.tiles, function(tile, ii) {
-                                var gutters = row.tiles.length < minRowLength ? Math.max(row.tiles.length - 1, perRow) : row.tiles.length - 1;
+                                var gutters = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) ? Math.max(row.tiles.length - 1, perRow - 1) : row.tiles.length - 1;
 
                                 var width, height;
 
@@ -125,7 +125,7 @@
                                     marginRight: 0
                                 };
 
-                                if (maxRowHeight > 0 && height === maxRowHeight && alignment === 'justify') {
+                                if (alignment === 'justify' && maxRowHeight > 0 && height === maxRowHeight) {
                                     css.marginLeft = ii > 0 ? (totalWidth - (maxRowHeight * rowRatio)) / (row.tiles.length - 1) : 0;
 
                                 } else {
