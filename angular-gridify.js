@@ -198,7 +198,7 @@
                     angular.element($window).on('resize', _resize);
 
                     scope.$on('$destroy', function() {
-                        angular.element($window).off('resize', resize);
+                        angular.element($window).off('resize', _resize);
                     });
 
                 }
