@@ -2,12 +2,3 @@ body {
 	margin: 0;
 	padding: 10px;
 }
-
-.gridify {
-	position: relative;
-	width: 100%;
-}
-
-.tile {
-	float: left;
-}

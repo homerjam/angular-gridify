@@ -1,3 +1,25 @@
+/*
+
+    Name: angular-gridify
+    Description: Angular directive that creates a justified grid of elements
+    Author: jameshomer85@gmail.com
+    Licence: MIT
+
+    Example usage:
+
+    A `data-ratio` attribute is required to calculate to determine sizes and layout, this should be calculated as `width / height`
+
+        <div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
+
+            <div class="wrapper">
+                
+                <div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}"></div>
+
+            </div>
+
+        </div>
+
+*/
 (function() {
     'use strict';
 
@@ -20,9 +42,20 @@
                         // maxRowHeight: 100 // rows will not exceed this height, use in combination with `alignment`
                         // alignment: 'left' // left/right/justify - alignment for rows which do not fill width
                         // minRowLength: 5 // optionally make rows longer than this fill the available width
+                        // watch: 'tiles' // collection to watch for changes
                     };
 
                     var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
+
+                    element.css({
+                        position: 'relative',
+                        width: '100%'
+                    });
+
+                    var wrapper = angular.element(element[0].querySelectorAll(options.wrapperSelector));
+                    wrapper.css({
+                        overflow: 'hidden'
+                    });
 
                     var _prop = function(propName) {
                         if (typeof(options[propName]) === 'string') {
@@ -42,7 +75,6 @@
                     };
 
                     var _resize = function() {
-
                         var totalWidth = element[0].clientWidth;
                         var totalRatio = 0,
                             rowRatio = 0;
@@ -64,6 +96,7 @@
                         var row = {
                             tiles: []
                         };
+
                         angular.forEach(targets, function(tile, i) {
                             tile = angular.element(tile);
 
@@ -96,6 +129,7 @@
 
                             row.tiles.push(tile);
                         });
+
                         row.ratio = rowRatio;
                         rows.push(row);
 
@@ -142,21 +176,30 @@
                             });
                         });
 
-                        angular.element(element[0].querySelectorAll(options.wrapperSelector)).css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
+                        wrapper.css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
                     };
 
-                    // wait for ng-repeat elements to be rendered
-                    $timeout(function() {
-
+                    var _init = function() {
                         targets = angular.element(element[0].querySelectorAll(options.tileSelector));
 
                         _resize();
 
-                        $timeout(_resize, 1); // trigger resize a second time just in case scrollbars kicked in
+                        $timeout(_resize); // trigger resize a second time just in case scrollbars kicked in
+                    };
 
-                    }, 1);
+                    $timeout(_init); // wait for ng-repeat elements to be rendered
+
+                    if (options.watch) {
+                        scope.$watch(options.watch, function(n, o) {
+                            _init();
+                        }, true);
+                    }
 
                     angular.element($window).on('resize', _resize);
+
+                    scope.$on('$destroy', function() {
+                        angular.element($window).off('resize', resize);
+                    });
 
                 }
             };

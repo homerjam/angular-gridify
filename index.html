@@ -8,21 +8,19 @@
 
 	</head>
 
-	<body ng-app="ExampleApp" ng-controller="ExampleCtrl">
+	<body ng-app="ExampleApp" ng-controller="ExampleCtrl" ng-click="generateTiles()">
 
-		<div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10}">
+		<div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
 
 			<div class="wrapper">
 				
 				<div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}" style="background-color: {{tile.color}}"></div>
 
-				<div style="clear: both;"></div>
-
 			</div>
 
 		</div>
 
-		<script type="text/javascript" src="http://code.angularjs.org/1.2.4/angular.min.js"></script>
+		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="angular-gridify.js"></script>
 		<script type="text/javascript" src="example/app.js"></script>
 
