@@ -190,9 +190,9 @@
                     $timeout(_init); // wait for ng-repeat elements to be rendered
 
                     if (options.watch) {
-                        scope.$watch(options.watch, function(n, o) {
+                        scope.$watchCollection(options.watch, function(n, o) {
                             _init();
-                        }, true);
+                        });
                     }
 
                     angular.element($window).on('resize', _resize);
