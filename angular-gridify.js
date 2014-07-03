@@ -29,23 +29,24 @@
                 restrict: 'A',
                 link: function link(scope, element, attrs) {
 
-                    var targets;
+                    var targets,
 
-                    var defaults = {
-                        wrapperSelector: '.wrapper',
-                        tileSelector: '[data-ratio]',
-                        perRow: 5,
-                        gutter: 0
-                        // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
-                        // gutterColumns: 10 // gutter between columns, overrides `gutter`
-                        // gutterRows: 10 // gutter between rows, overrides `gutter`
-                        // maxRowHeight: 100 // rows will not exceed this height, use in combination with `alignment`
-                        // alignment: 'left' // left/right/justify - alignment for rows which do not fill width
-                        // minRowLength: 5 // optionally make rows longer than this fill the available width
-                        // watch: 'tiles' // collection to watch for changes
-                    };
+                        defaults = {
+                            wrapperSelector: '.wrapper',
+                            tileSelector: '[data-ratio]',
+                            perRow: 5,
+                            gutter: 0
+                            // averageRatio: 1.5 // optionally try to balance rows by working in combination with `perRow`
+                            // gutterColumns: 10 // gutter between columns, overrides `gutter`
+                            // gutterRows: 10 // gutter between rows, overrides `gutter`
+                            // maxRowHeight: 100 // rows will not exceed this height, use in combination with `alignment`
+                            // alignment: 'left' // left/right/justify - alignment for rows which do not fill width
+                            // minRowLength: 5 // optionally make rows longer than this fill the available width
+                            // watch: 'tiles' // collection to watch for changes,
+                            // forceAverageHeight: false // optionally force last row height to be the average of previous rows (useful for equal sized tiles)
+                        },
 
-                    var options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
+                        options = angular.extend(defaults, scope.$eval(attrs.ngGridify));
 
                     element.css({
                         position: 'relative',
@@ -75,27 +76,30 @@
                     };
 
                     var _resize = function() {
-                        var totalWidth = element[0].clientWidth;
-                        var totalRatio = 0,
-                            rowRatio = 0;
+                        var totalWidth = element[0].clientWidth,
+                            totalRowHeight = 0,
+                            totalRatio = 0,
+                            rowRatio = 0,
 
-                        var rows = [];
-                        var perRow = _prop('perRow');
-                        var gutter = _prop('gutter');
+                            rows = [],
+                            perRow = _prop('perRow'),
+                            gutter = _prop('gutter'),
 
-                        var gutterColumns = _prop('gutterColumns');
-                        var gutterRows = _prop('gutterRows');
+                            gutterColumns = _prop('gutterColumns'),
+                            gutterRows = _prop('gutterRows'),
 
-                        var minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : -1;
-                        var averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0;
+                            minRowLength = options.minRowLength !== undefined ? _prop('minRowLength') : -1,
+                            averageRatio = options.averageRatio !== undefined ? _prop('averageRatio') : 0,
 
-                        var maxRowHeight = options.maxRowHeight !== undefined ? _prop('maxRowHeight') : 0;
+                            maxRowHeight = options.maxRowHeight !== undefined ? _prop('maxRowHeight') : 0,
 
-                        var alignment = options.alignment || 'left';
+                            alignment = options.alignment || 'left',
 
-                        var row = {
-                            tiles: []
-                        };
+                            forceAverageHeight = options.forceAverageHeight || false,
+
+                            row = {
+                                tiles: []
+                            };
 
                         angular.forEach(targets, function(tile, i) {
                             tile = angular.element(tile);
@@ -104,6 +108,7 @@
                             tile.inverseRatio = 1 / tile.ratio;
 
                             if (averageRatio) {
+                                // check if total averageRatio has been exceeded for the row or if row will exceed maxRowHeight - if true create new row
                                 if (rowRatio + tile.ratio > averageRatio * perRow && (maxRowHeight === 0 || (maxRowHeight > 0 && totalWidth * (1 / rowRatio) < maxRowHeight))) {
                                     row.ratio = rowRatio;
                                     rows.push(row);
@@ -134,21 +139,32 @@
                         rows.push(row);
 
                         angular.forEach(rows, function(row, i) {
+                            // if this is the last row then figure out what ratio to use (may want tiles to fill width or may want tiles to use average height)
                             rowRatio = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) && totalRatio > 0 ? Math.max(totalRatio / (rows.length - 1), row.ratio) : row.ratio;
 
                             totalRatio += rowRatio;
 
                             angular.forEach(row.tiles, function(tile, ii) {
-                                var gutters = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) ? Math.max(row.tiles.length - 1, perRow - 1) : row.tiles.length - 1;
+                                // if this is the last row then figure out how many gutters we need for calculations
+                                var gutters = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) ? Math.max(row.tiles.length - 1, perRow - 1) : row.tiles.length - 1,
+                                    width, height;
 
-                                var width, height;
+                                if (forceAverageHeight && i === rows.length - 1 && rows.length > 1) {
+                                    height = totalRowHeight / (rows.length - 1);
+                                    width = height * tile.ratio;
 
-                                width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * gutters));
-                                height = width * (1 / tile.ratio);
+                                } else {
+                                    width = (tile.ratio / rowRatio) * (totalWidth - ((gutterColumns || gutter) * gutters));
+                                    height = width * (1 / tile.ratio);
+                                }
 
                                 if (maxRowHeight > 0 && height > maxRowHeight) {
                                     height = maxRowHeight;
                                     width = height / tile.inverseRatio;
+                                }
+
+                                if (i < rows.length - 1 && ii === 0) {
+                                    totalRowHeight += height;
                                 }
 
                                 var css = {
