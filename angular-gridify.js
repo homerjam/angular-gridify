@@ -195,6 +195,23 @@
                         wrapper.css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
                     };
 
+                    var throttleOnAnimationFrame = function(func) {
+                        var timeout;
+                        return function() {
+                            var context = this,
+                                args = arguments;
+                            $window.cancelAnimationFrame(timeout);
+                            timeout = $window.requestAnimationFrame(function() {
+                                func.apply(context, args);
+                                timeout = null;
+                            });
+                        };
+                    };
+
+                    var _throttledResize = throttleOnAnimationFrame(_resize);
+
+                    angular.element($window).on('resize', _throttledResize);
+
                     var _init = function() {
                         targets = angular.element(element[0].querySelectorAll(options.tileSelector));
 
@@ -206,15 +223,13 @@
                     $timeout(_init); // wait for ng-repeat elements to be rendered
 
                     if (options.watch) {
-                        scope.$watchCollection(options.watch, function(n, o) {
+                        scope.$watch(options.watch, function(n, o) {
                             _init();
                         });
                     }
 
-                    angular.element($window).on('resize', _resize);
-
                     scope.$on('$destroy', function() {
-                        angular.element($window).off('resize', _resize);
+                        angular.element($window).off('resize', _throttledResize);
                     });
 
                 }
