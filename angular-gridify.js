@@ -12,7 +12,7 @@
         <div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
 
             <div class="wrapper">
-                
+
                 <div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}"></div>
 
             </div>
@@ -169,8 +169,8 @@
 
                                 var css = {
                                     float: alignment !== 'justify' ? alignment : 'left',
-                                    width: width,
-                                    height: height,
+                                    width: Math.floor(width),
+                                    height: Math.floor(height),
                                     marginLeft: 0,
                                     marginRight: 0
                                 };
@@ -192,7 +192,7 @@
                             });
                         });
 
-                        wrapper.css('width', totalWidth + 1); // add 1 to prevent firefox sometimes wrapping tiles
+                        wrapper.css('width', totalWidth);
                     };
 
                     var throttleOnAnimationFrame = function(func) {
