@@ -100,7 +100,9 @@
                             row = {
                                 tiles: []
                             };
-
+                            
+                        targets = angular.element(element[0].querySelectorAll(options.tileSelector));
+                       
                         angular.forEach(targets, function(tile, i) {
                             tile = angular.element(tile);
 
@@ -213,8 +215,6 @@
                     angular.element($window).on('resize', _throttledResize);
 
                     var _init = function() {
-                        targets = angular.element(element[0].querySelectorAll(options.tileSelector));
-
                         _resize();
 
                         $timeout(_resize); // trigger resize a second time just in case scrollbars kicked in
@@ -223,9 +223,9 @@
                     $timeout(_init); // wait for ng-repeat elements to be rendered
 
                     if (options.watch) {
-                        scope.$watchCollection(options.watch, function(n, o) {
-                            _init();
-                        });
+                        scope.$watch(function() {
+                            return scope[options.watch];
+                        }, _init);
                     }
 
                     scope.$on('$destroy', function() {
