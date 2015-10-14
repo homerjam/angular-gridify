@@ -7,7 +7,7 @@ angular.module('ExampleCtrl', []).controller('ExampleCtrl', ['$scope',
             for (var i = 0; i < 50; i++) {
 
                 $scope.tiles[i] = {
-                    ratio: Math.random() * 2,
+                    ratio: Math.max(0.5, Math.random() * 2),
                     color: '#' + ('000000' + Math.floor(Math.random() * 16777215).toString(16)).slice(-6)
                 };
 
