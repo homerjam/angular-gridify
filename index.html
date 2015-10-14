@@ -8,13 +8,17 @@
 
 	</head>
 
-	<body ng-app="ExampleApp" ng-controller="ExampleCtrl" ng-click="generateTiles()">
+	<body ng-app="ExampleApp" ng-controller="ExampleCtrl" ng-keypress="generateTiles()">
 
 		<div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
 
 			<div class="wrapper">
 				
-				<div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}" style="background-color: {{tile.color}}"></div>
+				<div ng-repeat="tile in tiles"
+					ng-click="removeTile($index)"
+					data-ratio="{{tile.ratio}}"
+					class="tile"
+					style="background-color: {{tile.color}}"></div>
 
 			</div>
 
