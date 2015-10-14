@@ -16,6 +16,10 @@ angular.module('ExampleCtrl', []).controller('ExampleCtrl', ['$scope',
 
         $scope.generateTiles();
 
+        $scope.removeTile = function(index) {
+            $scope.tiles.splice(index, 1);
+        };
+
     }
 ]);
 
