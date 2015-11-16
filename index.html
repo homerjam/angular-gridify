@@ -1,4 +1,4 @@
-<html>
+<html ng-app="ExampleApp" ng-strict-di>
 
 	<head>
 
@@ -8,21 +8,27 @@
 
 	</head>
 
-	<body ng-app="ExampleApp" ng-controller="ExampleCtrl" ng-keypress="generateTiles()">
+	<body ng-controller="ExampleCtrl as ctrl" ng-keypress="ctrl.generateItems()">
 
-		<div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
+		<hj-gridify
+			hj-gridify-options="{
+				collection: ctrl.items,
+				perRow: ctrl.perRow,
+				averageRatio: 1.5,
+				gutter: 10,
+			}"
+			hj-gridify-item-as="tile"
+		>
 
-			<div class="wrapper">
-				
-				<div ng-repeat="tile in tiles"
-					ng-click="removeTile($index)"
-					data-ratio="{{tile.ratio}}"
-					class="tile"
-					style="background-color: {{tile.color}}"></div>
+			<div
+				ng-click="ctrl.removeItem($index)"
+				class="item"
+				ng-style="{
+					'background-color': tile.color,
+				}"
+				></div>
 
-			</div>
-
-		</div>
+		</hj-gridify>
 
 		<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
 		<script type="text/javascript" src="angular-gridify.js"></script>

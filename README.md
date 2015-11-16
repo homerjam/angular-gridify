@@ -12,31 +12,21 @@ http://homerjam.github.io/angular-gridify/
 
 ## Usage
 
-#### Important!
-A `data-ratio` attribute is required to calculate to determine sizes and layout, this should be calculated as `width / height`.
+See example for more extensive instruction.
 
+#### Important!
+A `ratio` attribute is required on the collection items to calculate layout, this should be the result of `width / height`.
 
 #### Basic usage example:
-```html
-    <div class="gridify" ng-gridify="{wrapperSelector: '.wrapper', tileSelector: '.tile', perRow: 5, averageRatio: 1.5, gutter: 10, watch: 'tiles'}">
-
-        <div class="wrapper">
-            
-            <div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}"></div>
-
-        </div>
-
-    </div>
-```
-
-#### Using a function to set perRow value:
 ```js
 module.controller('MyCtrl', function($scope, $window) {
-    $scope.getPerRow = function() {
+    var ctrl = this;
+
+    ctrl.getPerRow = function() {
         return $window.innerWidth > 1000 ? 3 : 2;
     };
-    
-    $scope.tiles = [
+
+    ctrl.collection = [
         // items here
     ];
 });
@@ -44,22 +34,18 @@ module.controller('MyCtrl', function($scope, $window) {
 ```html
 <div ng-controller="MyCtrl">
 
-    <div class="gridify" ng-gridify="{
-        wrapperSelector: '.wrapper',
-        tileSelector: '.tile',
-        perRow: 'getPerRow',
+    <div hj-gridify="{
+        collection: ctrl.collection,
+        perRow: ctrl.getPerRow,
         averageRatio: 1.5,
         gutter: 10,
-        watch: 'tiles',
     }">
-    
-        <div class="wrapper">
-            
-            <div ng-repeat="tile in tiles" class="tile" data-ratio="{{tile.ratio}}"></div>
-    
+
+        <div class="tile">
+            Tile contents
         </div>
-    
+
     </div>
-    
+
 </div>
 ```

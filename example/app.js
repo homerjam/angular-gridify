@@ -1,26 +1,30 @@
-angular.module('ExampleCtrl', []).controller('ExampleCtrl', ['$scope',
-    function($scope) {
+angular.module('ExampleCtrl', []).controller('ExampleCtrl', ['$scope', '$window', function ($scope, $window) {
 
-        $scope.tiles = [];
+  var ctrl = this;
 
-        $scope.generateTiles = function() {
-            for (var i = 0; i < 50; i++) {
+  ctrl.generateItems = function () {
+    ctrl.items = [];
 
-                $scope.tiles[i] = {
-                    ratio: Math.max(0.5, Math.random() * 2),
-                    color: '#' + ('000000' + Math.floor(Math.random() * 16777215).toString(16)).slice(-6)
-                };
+    for (var i = 0; i < 50; i++) {
 
-            }
-        };
-
-        $scope.generateTiles();
-
-        $scope.removeTile = function(index) {
-            $scope.tiles.splice(index, 1);
-        };
+      ctrl.items[i] = {
+        ratio: Math.max(0.5, Math.random() * 2),
+        color: '#' + ('000000' + Math.floor(Math.random() * 16777215).toString(16)).slice(-6)
+      };
 
     }
-]);
+  };
 
-angular.module('ExampleApp', ['angular-gridify', 'ExampleCtrl']).config(function() {});
+  ctrl.generateItems();
+
+  ctrl.removeItem = function (index) {
+    ctrl.items.splice(index, 1);
+  };
+
+  ctrl.perRow = function () {
+    return $window.innerWidth > 768 ? 5 : 3;
+  };
+
+}]);
+
+angular.module('ExampleApp', ['hj.gridify', 'ExampleCtrl']);

@@ -1,6 +1,6 @@
 {
     "name": "angular-gridify",
-    "version": "0.0.19",
+    "version": "0.1.0",
     "description": "Angular directive that creates a justified grid of elements",
     "main": "angular-gridify.js",
     "ignore": [
