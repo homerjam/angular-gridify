@@ -203,7 +203,7 @@
 
                 totalRatio += rowRatio;
 
-                angular.forEach(row.tiles, function (tile, ii) {
+                angular.forEach(row.tiles, function (tile, j) {
                   // if this is the last row then figure out how many gutters we need for calculations
                   var gutters = i === rows.length - 1 && (row.tiles.length < minRowLength || minRowLength === -1) ? Math.max(row.tiles.length - 1, perRow - 1) : row.tiles.length - 1;
                   var width;
@@ -223,7 +223,7 @@
                     width = height / tile.inverseRatio;
                   }
 
-                  if (i < rows.length - 1 && ii === 0) {
+                  if (i < rows.length - 1 && j === 0) {
                     totalRowHeight += height;
                   }
 
@@ -238,17 +238,23 @@
                   };
 
                   if (alignment === 'justify' && maxRowHeight > 0 && height === maxRowHeight) {
-                    css.marginLeft = ii > 0 ? (totalWidth - (maxRowHeight * rowRatio)) / (row.tiles.length - 1) : 0;
+                    css.marginLeft = j > 0 ? (totalWidth - (maxRowHeight * rowRatio)) / (row.tiles.length - 1) : 0;
 
                   } else {
                     if (alignment === 'right') {
-                      css.marginLeft = ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
+                      css.marginLeft = j < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
                     } else {
-                      css.marginRight = ii < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
+                      css.marginRight = j < row.tiles.length - 1 ? (gutterColumns || gutter) : 0;
                     }
                   }
 
                   css.marginBottom = i < rows.length - 1 ? (gutterRows || gutter) : 0;
+
+                  for (var k in css) {
+                    if (typeof css[k] === 'number') {
+                      css[k] = css[k] + 'px';
+                    }
+                  }
 
                   tile.css(css);
                 });
