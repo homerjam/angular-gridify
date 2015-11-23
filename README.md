@@ -34,7 +34,7 @@ module.controller('MyCtrl', function($scope, $window) {
 ```html
 <div ng-controller="MyCtrl">
 
-    <div hj-gridify="{
+    <hj-gridify hj-gridify-options="{
         collection: ctrl.collection,
         perRow: ctrl.getPerRow,
         averageRatio: 1.5,
@@ -45,7 +45,7 @@ module.controller('MyCtrl', function($scope, $window) {
             Tile contents
         </div>
 
-    </div>
+    </hj-gridify>
 
 </div>
 ```
