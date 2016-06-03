@@ -4,7 +4,11 @@ Angular directive that creates a justified grid of elements
 
 ## Installation
 
-`bower install angular-gridify --save`
+`npm i -D angular-gridify`
+
+or
+
+`bower i -S angular-gridify`
 
 ## Demo
 
