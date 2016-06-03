@@ -73,6 +73,7 @@
               // alignment: 'left', // left/right/justify - alignment for rows which do not fill width
               // minRowLength: 5, // optionally make rows longer than this fill the available width
               // forceAverageHeight: false, // optionally force last row height to be the average of previous rows (useful for equal sized tiles)
+              // defaultRatio: 1, // used if tile 'ratio' property is unset.
             };
 
             var options;
@@ -145,6 +146,7 @@
 
               var minRowLength = options.minRowLength !== undefined ? getOption('minRowLength') : -1;
               var averageRatio = options.averageRatio !== undefined ? getOption('averageRatio') : 0;
+              var defaultRatio = options.defaultRatio;
 
               var maxRowHeight = options.maxRowHeight !== undefined ? getOption('maxRowHeight') : 0;
 
@@ -159,11 +161,11 @@
               angular.forEach(tiles, function (tile, i) {
                 tile = angular.element(tile);
 
-                if (!vm.collection[i].ratio) {
-                  return $log.error('hjGridify: tile is missing `ratio` property');
+                if (!vm.collection[i].ratio && !defaultRatio) {
+                  return $log.error('hjGridify: tile is missing `ratio` property and defaultRatio option not set');
                 }
 
-                tile.ratio = vm.collection[i].ratio;
+                tile.ratio = vm.collection[i].ratio || defaultRatio;
                 tile.inverseRatio = 1 / tile.ratio;
 
                 if (averageRatio) {
